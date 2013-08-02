@@ -1,52 +1,95 @@
-#include <iostream> 
-
-#include <map>
+#include <iostream>
+#include <vector>
 #include <string>
-#include <iomanip>
 using namespace std;
-int main ()
+
+class SalesOrder
 {
-    map<string, double> open_prices, current_prices;
-    string ticker;
-    double price; 
-    char x;
- 
-    cout<<"Enter ticker symble follow by ticker price: "<<endl;
- 
-    while (!cin.eof())
+      public:
+             void createOrder(int, int, int);
+             bool executable(int);
+             void execute(void);
+             SalesOrder(int, int, int, bool);
+             
+              int bid;
+              int lt;
+              int account;
+              bool complete;
+};
+
+int main()
 {
-    cin>>ticker>>price;
-    map<string, double>::iterator it;
-    it=current_prices.find(ticker);
- 
-    if(it == current_prices.end())
-    {
-     open_prices[ticker] = price;
-     current_prices[ticker] = price;
-     }
- 
-    else
-    {
-        if (price > it->second)
-        cout<<endl<<"Ticker "<<ticker<<" up "<<price - it->second<<endl<<endl;
-        else if (price < it->second)
-        cout<<endl<<"Ticker "<<ticker<<" down "<<it->second - price<<endl<<endl;
-        else
-        cout<<endl<<"Ticker "<<ticker<<" no change in price."<<endl<<endl;
- 
-         it->second = price;
-     }
-}
-         cout<<"Ticker"<<setw(10)<<"open"<<setw(15)<<"close"<<endl;
-     
-      map<string,double>::iterator ii=current_prices.begin();
-     
-    for( map<string, double>::iterator i=open_prices.begin(); i!=open_prices.end(); ++i)  
+    vector<SalesOrder> allOrders;
+    string type = "menu";
+    int acc, bPrice, lot;
+    int offerP = 1000000;
+    int i, e;
+    
+    cout<<"Welcom to WeiTrade!"<<endl;
+    
+  while (type == "menu" && e!=1)
+  {
+    cout<<"Please type any of the follow commands"<<endl<<endl;
+    cout<<"bid"<<endl<<"offer"<<endl<<"menu"<<endl<<"quit"<<endl<<endl;
+    
+    cin>>type;
+    if (type == "bid")
     {  
-         cout << i->first<< setw(14)<< i->second <<setw(14)<< ii->second << endl;
-         ++ii;
-    }       
-    cout<<"Thank you for using this program"<<endl;
-    system("pause");
-    return 0;
+       cout<<endl<<"enter account #, bid price and number of lots"<<endl;
+       cin>>acc>>bPrice>>lot;
+       SalesOrder newSalesOrder(bPrice, lot, acc, false);
+       cout<<"Creating Sales Order - Account Number: "<<acc<<", Bid Price: "
+       <<bPrice<<", Lots: "<<lot<<endl<<endl;
+        if (offerP <= bPrice)
+          newSalesOrder.execute();
+       allOrders.push_back(newSalesOrder);
+       type = "menu"; 
+    }
+    else if (type == "offer")
+         { cout<<"enter offer price:"<<endl;
+         cin>>offerP;
+         for (i=0; i< allOrders.size(); i+=1)
+             { 
+          if(allOrders[i].executable(offerP))
+               {
+            allOrders[i].execute();
+               }
+             }
+         type = "menu";
+         }
+    else if (type == "quit")
+    {
+         cout<<"Thanks for using WeiTrade."<<endl; 
+         e=1;
+    }  
+    else 
+         cout<<"Invalid Entry"<<endl;  
+
+  }
+system ("PAUSE");
+return 0;
 }
+          
+SalesOrder::SalesOrder(int bidPrice, int lots, int accountnumber, bool)
+{ 
+  bid = bidPrice;
+  lt = lots;
+  account = accountnumber;
+  complete = false;
+  
+};
+
+bool SalesOrder::executable(int offerPrice)
+{
+     if(offerPrice <= bid && complete == false)
+     return true;
+     return false;
+}
+
+void SalesOrder::execute(void)
+{
+     cout<<"Executing Sales Order - Account Number: " <<
+            account<<" Bid Price: "<<bid<<" Lots: "<< lt<<endl<<endl;
+    complete=true;
+
+};
